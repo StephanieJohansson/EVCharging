@@ -1,9 +1,11 @@
 package com.example.EVCharging;
 
 import com.example.EVCharging.dto.BatteryInfo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.example.EVCharging.dto.EnergyData;
+import com.example.EVCharging.dto.PriceData;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/charging")
@@ -17,5 +19,30 @@ public class ChargingController {
     @GetMapping("/info")
     public BatteryInfo getBatteryInfo() {
         return chargingService.getBatteryInfo();
+    }
+
+    @GetMapping("/baseload")
+    public List<EnergyData> getEnergyData() {
+        return chargingService.getEnergyData();
+    }
+
+    @GetMapping("/priceperhour")
+    public List<PriceData> getPriceData() {
+        return chargingService.getPriceData();
+    }
+
+    @PostMapping("/charge")
+    public String chargeBattery(@RequestParam boolean start) {
+        return chargingService.chargeBattery(start);
+    }
+
+    @PostMapping("/optimize/consumption")
+    public String optimizeForConsumption() {
+        return chargingService.OptimizeForConsumption();
+    }
+
+    @PostMapping("/optimize/price")
+    public String optimizeForPrice() {
+        return chargingService.optimizeForPrice();
     }
 }
