@@ -25,21 +25,19 @@ public class ChargingController {
 
     @GetMapping("/baseload")
     public List<EnergyData> getEnergyData() {
-        List<Double> consumptions = chargingService.getEnergyData();
         List<EnergyData> energyDataList = new ArrayList<>();
-        for (int i = 0; i < consumptions.size(); i++) {
-            energyDataList.add(new EnergyData(i, consumptions.get(i)));
-        }
+        // Exempeldata, ersätt med data från Python-servern
+        energyDataList.add(new EnergyData(0, 1.5));
+        energyDataList.add(new EnergyData(1, 2.0));
         return energyDataList;
     }
-
+    
     @GetMapping("/priceperhour")
     public List<PriceData> getPriceData() {
-        List<Double> prices = chargingService.getPriceData();
         List<PriceData> priceDataList = new ArrayList<>();
-        for (int i = 0; i < prices.size(); i++) {
-            priceDataList.add(new PriceData(i, prices.get(i)));
-        }
+        // Exempeldata, ersätt med data från Python-servern
+        priceDataList.add(new PriceData(0, 85.28));
+        priceDataList.add(new PriceData(1, 70.86));
         return priceDataList;
     }
 

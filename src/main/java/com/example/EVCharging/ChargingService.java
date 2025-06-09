@@ -84,23 +84,6 @@ public class ChargingService {
     }
 
 
-    // Hjälpmetod för att extrahera Double-värden från ett HTML-liknande svar
-    private List<Double> parseHtmlResponseToDoubles(String html) {
-        List<Double> prices = new ArrayList<>();
-        try {
-            // Exempel: extrahera siffror om HTML innehåller data
-            String[] parts = html.split("[^0-9.,]+");
-            for (String part : parts) {
-                try {
-                    prices.add(Double.parseDouble(part));
-                } catch (NumberFormatException ignored) {
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Kunde inte extrahera värden från HTML-responsen: " + e.getMessage());
-        }
-        return prices;
-    }
 
 
 public ChargeResult chargeBattery(boolean start) {

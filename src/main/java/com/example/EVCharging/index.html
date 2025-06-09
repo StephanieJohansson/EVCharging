@@ -1,76 +1,360 @@
 <!DOCTYPE html>
 <html lang="sv">
-<head>
+<hea>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EV Charging Service</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        button {
-            margin: 10px 0;
-        }
-        .output {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div>
 <h1>EV Charging Service</h1>
+<div class="info-wrapper">
+    <div class="info-container">
+        <h2>Serverinformation</h2>
+        <div id="serverInfo">
+            <p>Hämtar data...</p>
+        </div>
+    </div>
+    <img src="electric-vehicle-charging-station-flat-style-free-vector.png" alt=" " class="info-image">
+</div>
 
-<h2>Funktioner</h2>
+<div class="app-container">
+    <div class="left-column">
+        <h2>Prisinformation</h2>
+        <button id="getPriceInfo">Hämta prisinformation</button>
+        <div class="output" id="priceInfoOutput" style="display: none;"></div>
 
-<!-- Hämta prisdata -->
-<button id="getPriceData">Hämta pris per timme</button>
-<div class="output" id="priceOutput"></div>
+        <h2>Energiförbrukning</h2>
+        <button id="getBaseLoad">Hämta energiförbrukning</button>
+        <div class="output" id="baseLoadOutput" style="display: none;"></div>
 
-<!-- Starta/Stäng av laddning -->
-<button id="startCharging">Starta laddning</button>
-<button id="stopCharging">Stoppa laddning</button>
-<div class="output" id="chargeOutput"></div>
+        <h2>Ladda batteriet</h2>
+        <button id="chargeBattery">Ladda batteriet (20% till 80%)</button>
+        <div class="output" id="batteryChargeOutput" style="display: none;"></div>
+
+        <h2>Starta/Stäng av laddning</h2>
+        <button id="startCharging">Starta laddning</button>
+        <button id="stopCharging">Stoppa laddning</button>
+        <div class="output" id="chargeOutput" style="display: none;"></div>
+    </div>
+
+    <div class="right-column">
+        <h2>Återställ batteriet</h2>
+        <button id="dischargeBattery">Återställ batteriet till 20%</button>
+        <div class="output" id="dischargeOutput" style="display: none;"></div>
+
+        <h2>Optimera laddning</h2>
+        <button id="optimizeCharging">Optimera laddning</button>
+        <div class="output" id="optimizeOutput" style="display: none;"></div>
+
+        <h2>Energiåtgång</h2>
+        <button id="getEnergyUsage">Visa energiåtgång</button>
+        <div class="output" id="energyUsageOutput" style="display: none;"></div>
+    </div>
+</div>
+
+
 
 <script>
-    // Bas-URL för din server
-    const BASE_URL = "http://localhost:8080/api/charging";
+    const BASE_URL = "http://127.0.0.1:5000";
 
-    // Hämta pris per timme
-    document.getElementById("getPriceData").addEventListener("click", () => {
-        fetch(`${BASE_URL}/priceperhour`)
+    function updateServerInfo() {
+    const serverInfoDiv = document.getElementById("serverInfo");
+
+    // Hämta data från /info varje sekund
+    setInterval(() => {
+        fetch(`${BASE_URL}/info`)
             .then(response => response.json())
             .then(data => {
-                document.getElementById("priceOutput").innerHTML =
-                    "<h3>Elpris per timme:</h3>" +
-                    data.map((price, hour) => `Timme ${hour}: ${price} öre/kWh`).join("<br>");
+                serverInfoDiv.innerHTML = `
+                    <p><strong>Tid:</strong> ${data.sim_time_hour}:${data.sim_time_min}</p>
+                    <p><strong>Hushållets förbrukning:</strong> ${data.base_current_load.toFixed(2)} kW</p>
+                    <p><strong>Batteriets kapacitet:</strong> ${data.battery_capacity_kWh.toFixed(2)} kWh</p>
+                    <p><strong>Laddning pågår:</strong> ${data.ev_battery_charge_start_stopp ? "Ja" : "Nej"}</p>
+                `;
             })
             .catch(error => {
-                document.getElementById("priceOutput").innerHTML = `<p style="color: red;">Fel vid hämtning av prisdata: ${error}</p>`;
+                serverInfoDiv.innerHTML = `<p style="color: red;">Fel vid hämtning av serverdata: ${error.message}</p>`;
             });
+    }, 1000); // Uppdatera varje sekund
+}
+
+// Kör funktionen för att starta uppdateringen
+updateServerInfo();
+
+    // Funktion för att toggla synlighet
+    function toggleVisibility(element) {
+        if (element.style.display === "none") {
+            element.style.display = "block"; // Visa elementet
+        } else {
+            element.style.display = "none"; // Dölj elementet
+        }
+    }
+
+    // Hämta prisinformation
+    document.getElementById("getPriceInfo").addEventListener("click", () => {
+        const output = document.getElementById("priceInfoOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            fetch(`${BASE_URL}/priceperhour`)
+                .then(response => response.json())
+                .then(data => {
+                    output.innerHTML =
+                        "<h3>Elpris per timme:</h3>" +
+                        data.map((price, hour) => `Timme ${hour}: ${price} öre/kWh`).join("<br>");
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid hämtning av prisdata: ${error}</p>`;
+                });
+        }
     });
 
-    // Starta laddning
-    document.getElementById("startCharging").addEventListener("click", () => {
-        fetch(`${BASE_URL}/charge?start=true`, { method: "POST" })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("chargeOutput").innerText = `Laddning startad. Status: ${data.status}`;
-            })
-            .catch(error => {
-                document.getElementById("chargeOutput").innerHTML = `<p style="color: red;">Fel vid laddning: ${error}</p>`;
-            });
+    // Hämta energiförbrukning
+    document.getElementById("getBaseLoad").addEventListener("click", () => {
+        const output = document.getElementById("baseLoadOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            fetch(`${BASE_URL}/baseload`)
+                .then(response => response.json())
+                .then(data => {
+                    output.innerHTML =
+                        "<h3>Energiförbrukning per timme:</h3>" +
+                        data.map((load, hour) => `Timme ${hour}: ${load} kW`).join("<br>");
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid hämtning av energiförbrukning: ${error}</p>`;
+                });
+        }
     });
 
-    // Stoppa laddning
-    document.getElementById("stopCharging").addEventListener("click", () => {
-        fetch(`${BASE_URL}/charge?start=false`, { method: "POST" })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("chargeOutput").innerText = `Laddning stoppad. Status: ${data.status}`;
+    // Ladda batteriet från 20% till 80%
+    document.getElementById("chargeBattery").addEventListener("click", () => {
+        const output = document.getElementById("batteryChargeOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            fetch(`${BASE_URL}/charge`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ charging: "on" })
             })
-            .catch(error => {
-                document.getElementById("chargeOutput").innerHTML = `<p style="color: red;">Fel vid laddning: ${error}</p>`;
-            });
+                .then(() => {
+                    const interval = setInterval(() => {
+                        fetch(`${BASE_URL}/info`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const batteryPercent = (data.battery_capacity_kWh / 46.3) * 100;
+                                output.innerText = `Batteriets laddning: ${batteryPercent.toFixed(2)}%`;
+                                if (batteryPercent >= 80) {
+                                    clearInterval(interval);
+                                    fetch(`${BASE_URL}/charge`, {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ charging: "off" })
+                                    });
+                                }
+                            });
+                    }, 1000);
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid laddning: ${error}</p>`;
+                });
+        }
+    });
+
+        // Variabel för att hålla intervallet för batteriavläsning
+        let chargingInterval;
+        let isCharging = false; // Variabel för att hålla reda på om laddningen är igång
+        
+        // Starta laddning
+        document.getElementById("startCharging").addEventListener("click", () => {
+            const output = document.getElementById("chargeOutput");
+            output.style.display = "block"; // Visa alltid output när laddning startar
+            isCharging = true; // Markera att laddningen är igång
+        
+            // Skicka POST-förfrågan för att starta laddning
+            fetch(`${BASE_URL}/charge`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ charging: "on" })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fel vid start av laddning.");
+                    }
+        
+                    // Starta intervallet för att avläsa batteriets laddningsnivå
+                    chargingInterval = setInterval(() => {
+                        fetch(`${BASE_URL}/info`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const batteryPercent = (data.battery_capacity_kWh / 46.3) * 100;
+                                output.innerText = `Batteriets laddning: ${batteryPercent.toFixed(2)}%`;
+        
+                                // Stoppa laddningen automatiskt om batteriet når 100%
+                                if (batteryPercent >= 100) {
+                                    clearInterval(chargingInterval);
+                                    stopChargingAutomatically(output);
+                                }
+                            })
+                            .catch(error => {
+                                output.innerHTML = `<p style="color: red;">Fel vid avläsning av batteriets laddning: ${error}</p>`;
+                            });
+                    }, 1000); // Avläs batteriets laddning varje sekund
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid start av laddning: ${error}</p>`;
+                });
+        });
+        
+        // Stoppa laddning
+        document.getElementById("stopCharging").addEventListener("click", () => {
+            const output = document.getElementById("chargeOutput");
+        
+            // Skicka POST-förfrågan för att stoppa laddning
+            fetch(`${BASE_URL}/charge`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ charging: "off" })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fel vid stopp av laddning.");
+                    }
+        
+                    // Stoppa intervallet för batteriavläsning
+                    clearInterval(chargingInterval);
+                    isCharging = false; // Markera att laddningen har stoppats
+        
+                    // Visa bekräftelsemeddelande
+                    output.innerText = "Laddning stoppad.";
+                    setTimeout(() => {
+                        if (!isCharging) {
+                            output.style.display = "none"; // Dölj output endast om laddningen inte är igång
+                        }
+                    }, 10000); // 10 sekunder
+        
+                    // Lägg till en eventlyssnare för att dölja output vid nytt klick
+                    document.getElementById("stopCharging").addEventListener("click", () => {
+                        if (!isCharging) {
+                            output.style.display = "none";
+                        }
+                    }, { once: true }); // Kör bara en gång
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid stopp av laddning: ${error}</p>`;
+                });
+        });
+        
+        // Funktion för att automatiskt stoppa laddning när batteriet är fullt
+        function stopChargingAutomatically(output) {
+            fetch(`${BASE_URL}/charge`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ charging: "off" })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fel vid automatisk stopp av laddning.");
+                    }
+        
+                    // Visa meddelande om att laddningen stoppades automatiskt
+                    output.innerText += "\nLaddning stoppad automatiskt. Batteriet är fullt.";
+                    clearInterval(chargingInterval);
+                    isCharging = false; // Markera att laddningen har stoppats
+        
+                    // Dölj output efter 10 sekunder
+                    setTimeout(() => {
+                        if (!isCharging) {
+                            output.style.display = "none";
+                        }
+                    }, 10000);
+                })
+                .catch(error => {
+                    output.innerHTML += `<p style="color: red;">Fel vid automatisk stopp av laddning: ${error}</p>`;
+                });
+        }
+
+    // Återställ batteriet till 20%
+    document.getElementById("dischargeBattery").addEventListener("click", () => {
+        const output = document.getElementById("dischargeOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            fetch(`${BASE_URL}/discharge`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ discharging: "on" })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fel vid återställning av batteriet.");
+                    }
+                    return fetch(`${BASE_URL}/info`);
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const batteryPercent = (data.battery_capacity_kWh / 46.3) * 100;
+                    output.innerText = `Batteriet har återställts till 20%. Nuvarande laddning: ${batteryPercent.toFixed(2)}%.`;
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid återställning av batteriet: ${error.message}</p>`;
+                });
+        }
+    });
+
+    // Optimera laddning
+    document.getElementById("optimizeCharging").addEventListener("click", () => {
+        const output = document.getElementById("optimizeOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            Promise.all([
+                fetch(`${BASE_URL}/baseload`).then(response => response.json()),
+                fetch(`${BASE_URL}/priceperhour`).then(response => response.json())
+            ])
+                .then(([baseLoad, pricePerHour]) => {
+                    let bestHour = -1;
+                    let minCost = Number.MAX_VALUE;
+
+                    for (let hour = 0; hour < 24; hour++) {
+                        if (baseLoad[hour] + 7.4 <= 11) {
+                            const cost = pricePerHour[hour];
+                            if (cost < minCost) {
+                                minCost = cost;
+                                bestHour = hour;
+                            }
+                        }
+                    }
+
+                    if (bestHour !== -1) {
+                        output.innerText = `Ladda vid timme ${bestHour} då priset är som lägst (${pricePerHour[bestHour]} öre/kWh) och förbrukningen är ${baseLoad[bestHour]} kW.`;
+                    } else {
+                        output.innerText = "Ingen optimal tidpunkt hittades för laddning.";
+                    }
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid optimering: ${error}</p>`;
+                });
+        }
+    });
+
+    // Visa energiåtgång
+    document.getElementById("getEnergyUsage").addEventListener("click", () => {
+        const output = document.getElementById("energyUsageOutput");
+        toggleVisibility(output);
+        if (output.style.display === "block") {
+            fetch(`${BASE_URL}/info`)
+                .then(response => response.json())
+                .then(data => {
+                    output.innerHTML = `
+                        <h3>Energiåtgång:</h3>
+                        Tid: ${data.sim_time_hour}:${data.sim_time_min}<br>
+                        Total förbrukning: ${data.base_current_load} kW
+                    `;
+                })
+                .catch(error => {
+                    output.innerHTML = `<p style="color: red;">Fel vid hämtning av energiåtgång: ${error}</p>`;
+                });
+        }
     });
 </script>
 </body>

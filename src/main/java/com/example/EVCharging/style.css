@@ -1,0 +1,84 @@
+body {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-style: oblique;
+    font-stretch: expanded;
+    margin: 0;
+    padding: 20px;
+    background-color:  rgb(60, 95, 82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+h1 {
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+h2 {
+    color: rgb(255, 255, 255);
+}
+.app-container {
+    display: flex;
+    gap: 20px; /* Mellanrum mellan kolumnerna */
+    background-color: rgba(166, 168, 168, 0.3); /* Halvgenomskinlig bakgrundsfärg */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 120%;
+    height: auto; /* Gör att containern anpassar sig efter innehållet */
+    max-width: 1200px; /* Maxbredd för att hålla layouten snygg */
+    flex-wrap: wrap; /* Gör att kolumnerna kan brytas till nästa rad vid behov */
+    margin-top: 20px; /* Marginal ovanför app-container */
+}
+.left-column, .right-column {
+    flex: 1; /* Gör att kolumnerna tar lika mycket plats */
+    text-align: center; /* Centrera texten i varje kolumn */
+}
+button {
+    background-color: rgba(23, 71, 54, 0.288);
+    color: rgb(255, 255, 255);
+    border: 2xp solid rgb(255, 255, 255);
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+    border-radius: 45%;
+    font-size: 16px;
+    font-weight: lighter;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    margin: 10px;
+}
+button:hover {
+    background-color: rgba(111, 158, 148, 0.596);
+    border-color: rgb(255, 255, 255);
+}
+.info-container {
+    h2 {
+        margin-top: 0; /* Ta bort översta marginalen för h2 i info-container */
+    }
+    background-color: rgba(166, 168, 168, 0.3);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: center;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    flex-direction: column; /* Gör att innehållet i info-container ordnas vertikalt */
+}
+.info-wrapper {
+    display: flex; /* Placera innehållet horisontellt */
+    align-items: center; /* Centrera innehållet vertikalt */
+    gap: 20px; /* Lägg till mellanrum mellan containern och bilden */
+    margin-top: 20px; /* Marginal ovanför hela sektionen */
+}
+
+.info-image {
+    max-width: 200px; /* Begränsa bildens bredd */
+    height: auto; /* Bevara bildens proportioner */
+    border-radius: 10px; /* Gör hörnen på bilden rundade */
+}
