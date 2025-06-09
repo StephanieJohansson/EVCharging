@@ -1,10 +1,12 @@
 package com.example.EVCharging;
 
 import com.example.EVCharging.dto.BatteryInfo;
+import com.example.EVCharging.dto.ChargeResult;
 import com.example.EVCharging.dto.EnergyData;
 import com.example.EVCharging.dto.PriceData;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,26 +25,36 @@ public class ChargingController {
 
     @GetMapping("/baseload")
     public List<EnergyData> getEnergyData() {
-        return chargingService.getEnergyData();
+        List<Double> consumptions = chargingService.getEnergyData();
+        List<EnergyData> energyDataList = new ArrayList<>();
+        for (int i = 0; i < consumptions.size(); i++) {
+            energyDataList.add(new EnergyData(i, consumptions.get(i)));
+        }
+        return energyDataList;
     }
 
     @GetMapping("/priceperhour")
     public List<PriceData> getPriceData() {
-        return chargingService.getPriceData();
+        List<Double> prices = chargingService.getPriceData();
+        List<PriceData> priceDataList = new ArrayList<>();
+        for (int i = 0; i < prices.size(); i++) {
+            priceDataList.add(new PriceData(i, prices.get(i)));
+        }
+        return priceDataList;
     }
 
     @PostMapping("/charge")
-    public String chargeBattery(@RequestParam boolean start) {
+    public ChargeResult chargeBattery(@RequestParam boolean start) {
         return chargingService.chargeBattery(start);
     }
 
     @PostMapping("/optimize/consumption")
-    public String optimizeForConsumption() {
-        return chargingService.OptimizeForConsumption();
+    public ChargeResult optimizeForConsumption() {
+        return chargingService.optimizeForLowConsumption();
     }
 
     @PostMapping("/optimize/price")
-    public String optimizeForPrice() {
-        return chargingService.optimizeForPrice();
+    public ChargeResult optimizeForPrice() {
+        return chargingService.optimizeForLowPrice();
     }
 }

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Charging Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        button {
+            margin: 10px 0;
+        }
+        .output {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>EV Charging Service</h1>
+
+<h2>Funktioner</h2>
+
+<!-- Hämta prisdata -->
+<button id="getPriceData">Hämta pris per timme</button>
+<div class="output" id="priceOutput"></div>
+
+<!-- Starta/Stäng av laddning -->
+<button id="startCharging">Starta laddning</button>
+<button id="stopCharging">Stoppa laddning</button>
+<div class="output" id="chargeOutput"></div>
+
+<script>
+    // Bas-URL för din server
+    const BASE_URL = "http://localhost:8080/api/charging";
+
+    // Hämta pris per timme
+    document.getElementById("getPriceData").addEventListener("click", () => {
+        fetch(`${BASE_URL}/priceperhour`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("priceOutput").innerHTML =
+                    "<h3>Elpris per timme:</h3>" +
+                    data.map((price, hour) => `Timme ${hour}: ${price} öre/kWh`).join("<br>");
+            })
+            .catch(error => {
+                document.getElementById("priceOutput").innerHTML = `<p style="color: red;">Fel vid hämtning av prisdata: ${error}</p>`;
+            });
+    });
+
+    // Starta laddning
+    document.getElementById("startCharging").addEventListener("click", () => {
+        fetch(`${BASE_URL}/charge?start=true`, { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("chargeOutput").innerText = `Laddning startad. Status: ${data.status}`;
+            })
+            .catch(error => {
+                document.getElementById("chargeOutput").innerHTML = `<p style="color: red;">Fel vid laddning: ${error}</p>`;
+            });
+    });
+
+    // Stoppa laddning
+    document.getElementById("stopCharging").addEventListener("click", () => {
+        fetch(`${BASE_URL}/charge?start=false`, { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("chargeOutput").innerText = `Laddning stoppad. Status: ${data.status}`;
+            })
+            .catch(error => {
+                document.getElementById("chargeOutput").innerHTML = `<p style="color: red;">Fel vid laddning: ${error}</p>`;
+            });
+    });
+</script>
+</body>
+</html>
