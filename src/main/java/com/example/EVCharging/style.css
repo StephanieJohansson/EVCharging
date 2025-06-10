@@ -12,6 +12,12 @@ body {
 h1 {
     color: rgb(255, 255, 255);
     text-align: center;
+    font-weight: bold;
+    font-size: 2.5em; /* Större rubrikstorlek */
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Inre skugga för djup */
+    padding: 10px; /* Padding för att ge lite utrymme runt texten */
+    border-radius: 10px; /* Rundade hörn för rubriken */
+    background-color: rgba(166, 168, 168, 0.3);
 }
 h2 {
     color: rgb(255, 255, 255);
@@ -23,7 +29,7 @@ h2 {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 120%;
+    width: 1200px;
     height: auto; /* Gör att containern anpassar sig efter innehållet */
     max-width: 1200px; /* Maxbredd för att hålla layouten snygg */
     flex-wrap: wrap; /* Gör att kolumnerna kan brytas till nästa rad vid behov */
@@ -56,7 +62,7 @@ button:hover {
 }
 .info-container {
     h2 {
-        margin-top: 0; /* Ta bort översta marginalen för h2 i info-container */
+    margin-top: 0; /* Ta bort översta marginalen för h2 i info-container */
     }
     background-color: rgba(166, 168, 168, 0.3);
     color: white;
@@ -73,12 +79,29 @@ button:hover {
 .info-wrapper {
     display: flex; /* Placera innehållet horisontellt */
     align-items: center; /* Centrera innehållet vertikalt */
-    gap: 20px; /* Lägg till mellanrum mellan containern och bilden */
+    justify-content: space-between; /* Jämna ut utrymmet mellan elementen */
+    gap: 100px; /* Lägg till mellanrum mellan containern och bilden */
     margin-top: 20px; /* Marginal ovanför hela sektionen */
 }
-
+.info-container {
+    flex: 1; /* Gör att varje container tar lika mycket plats */
+    text-align: center; /* Centrera texten i varje container */
+}
 .info-image {
     max-width: 200px; /* Begränsa bildens bredd */
     height: auto; /* Bevara bildens proportioner */
     border-radius: 10px; /* Gör hörnen på bilden rundade */
+}
+.battery-status {
+    flex: 1; /* Gör att batterinivån tar lika mycket plats som serverinformationen */
+    text-align: center; /* Centrera texten */
+    background-color: rgba(166, 168, 168, 0.3); /* Halvgenomskinlig bakgrund */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    max-width: 200px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
 }
