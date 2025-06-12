@@ -125,7 +125,7 @@ updateServerInfo();
                 .then(data => {
                     output.innerHTML =
                         "<h3>Energiförbrukning per timme:</h3>" +
-                        data.map((load, hour) => `Timme ${hour}: ${load} kW`).join("<br>");
+                        data.map((load, hour) => `Timme ${hour}: ${load} kWh`).join("<br>");
                 })
                 .catch(error => {
                     output.innerHTML = `<p style="color: red;">Fel vid hämtning av energiförbrukning: ${error}</p>`;
